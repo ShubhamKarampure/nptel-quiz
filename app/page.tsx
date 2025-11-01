@@ -1,7 +1,6 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, X, Check, Github } from "lucide-react";
-
 
 import week1 from "../data/week1";
 import week2 from "../data/week2";
@@ -31,20 +30,22 @@ const quizData = {
   week_12: week12,
 };
 
+type WeekKey = keyof typeof quizData;
+
 const NPTELQuiz = () => {
-  const [selectedWeek, setSelectedWeek] = useState(null);
+  const [selectedWeek, setSelectedWeek] = useState<WeekKey | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answers, setAnswers] = useState({});
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
 
-  const weeks = Object.keys(quizData).map((key, idx) => ({
+  const weeks = (Object.keys(quizData) as WeekKey[]).map((key, idx) => ({
     id: key,
     name: `Week ${idx + 1}`,
     title: quizData[key].title,
   }));
 
-  const handleWeekSelect = (weekId) => {
+  const handleWeekSelect = (weekId: WeekKey) => {
     setSelectedWeek(weekId);
     setCurrentQuestion(0);
     setSelectedAnswer(null);
@@ -52,7 +53,7 @@ const NPTELQuiz = () => {
     setShowResults(false);
   };
 
-  const handleAnswerSelect = (optionIndex) => {
+  const handleAnswerSelect = (optionIndex: number) => {
     if (answers[currentQuestion] !== undefined) return;
 
     setSelectedAnswer(optionIndex);
@@ -63,17 +64,18 @@ const NPTELQuiz = () => {
   };
 
   const handleNext = () => {
+    if (!selectedWeek) return;
     const totalQuestions = quizData[selectedWeek].questions.length;
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(answers[currentQuestion + 1]);
+      setSelectedAnswer(answers[currentQuestion + 1] ?? null);
     }
   };
 
   const handleBack = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      setSelectedAnswer(answers[currentQuestion - 1]);
+      setSelectedAnswer(answers[currentQuestion - 1] ?? null);
     }
   };
 
@@ -82,6 +84,7 @@ const NPTELQuiz = () => {
   };
 
   const calculateScore = () => {
+    if (!selectedWeek) return { correct: 0, wrong: 0, total: 0 };
     const questions = quizData[selectedWeek].questions;
     let correct = 0;
     let wrong = 0;
@@ -98,6 +101,7 @@ const NPTELQuiz = () => {
   };
 
   const getCurrentScore = () => {
+    if (!selectedWeek) return { correct: 0, wrong: 0 };
     const questions = quizData[selectedWeek].questions;
     let correct = 0;
     let wrong = 0;
@@ -121,7 +125,7 @@ const NPTELQuiz = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">
-              NPTEL Quiz
+              NPTEL Environment and Development Quiz
             </h1>
             <p className="text-gray-400 text-sm sm:text-base">
               Select a week to start the quiz
@@ -304,48 +308,48 @@ const NPTELQuiz = () => {
           </h3>
 
           <div className="space-y-3 sm:space-y-4">
-            {question.options.map((option, idx) => {
-              const isSelected = selectedAnswer === idx;
-              const isCorrect = idx === question.correctAnswer;
-              const showCorrect = isAnswered && isCorrect;
-              const showIncorrect = isAnswered && isSelected && !isCorrect;
+            {question.options.map((option: string, idx: number): React.ReactElement => {
+              const isSelected: boolean = selectedAnswer === idx;
+              const isCorrect: boolean = idx === question.correctAnswer;
+              const showCorrect: boolean = isAnswered && isCorrect;
+              const showIncorrect: boolean = isAnswered && isSelected && !isCorrect;
 
-              let buttonClass =
-                "w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all ";
+              let buttonClass: string =
+              "w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all ";
 
               if (showCorrect) {
-                buttonClass += "border-green-500 bg-green-900/20";
+              buttonClass += "border-green-500 bg-green-900/20";
               } else if (showIncorrect) {
-                buttonClass += "border-red-500 bg-red-900/20";
+              buttonClass += "border-red-500 bg-red-900/20";
               } else if (!isAnswered) {
-                buttonClass +=
-                  "border-gray-700 bg-gray-800 hover:border-gray-600 cursor-pointer active:scale-98";
+              buttonClass +=
+                "border-gray-700 bg-gray-800 hover:border-gray-600 cursor-pointer active:scale-98";
               } else {
-                buttonClass += "border-gray-700 bg-gray-800";
+              buttonClass += "border-gray-700 bg-gray-800";
               }
 
               return (
-                <button
-                  key={idx}
-                  onClick={() => handleAnswerSelect(idx)}
-                  disabled={isAnswered}
-                  className={buttonClass}
-                >
-                  <div className="flex items-start gap-2 sm:gap-3">
-                    <span className="font-semibold text-gray-400 min-w-[20px] sm:min-w-[24px] text-sm sm:text-base">
-                      {String.fromCharCode(65 + idx)}.
-                    </span>
-                    <span className="flex-1 text-sm sm:text-base leading-relaxed">
-                      {option}
-                    </span>
-                    {showCorrect && (
-                      <Check className="text-green-500 flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
-                    )}
-                    {showIncorrect && (
-                      <X className="text-red-500 flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
-                    )}
-                  </div>
-                </button>
+              <button
+                key={idx}
+                onClick={() => handleAnswerSelect(idx)}
+                disabled={isAnswered}
+                className={buttonClass}
+              >
+                <div className="flex items-start gap-2 sm:gap-3">
+                <span className="font-semibold text-gray-400 min-w-[20px] sm:min-w-[24px] text-sm sm:text-base">
+                  {String.fromCharCode(65 + idx)}.
+                </span>
+                <span className="flex-1 text-sm sm:text-base leading-relaxed">
+                  {option}
+                </span>
+                {showCorrect && (
+                  <Check className="text-green-500 flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+                {showIncorrect && (
+                  <X className="text-red-500 flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+                </div>
+              </button>
               );
             })}
           </div>
