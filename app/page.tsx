@@ -1,6 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, X, Check, Github } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Check,
+  Github,
+  RotateCcw,
+} from "lucide-react";
 
 import week1 from "../data/week1";
 import week2 from "../data/week2";
@@ -32,12 +39,80 @@ const quizData = {
 
 type WeekKey = keyof typeof quizData;
 
+interface WeekProgress {
+  currentQuestion: number;
+  answers: Record<number, number>;
+  showResults: boolean;
+}
+
+interface QuizProgress {
+  [key: string]: WeekProgress;
+}
+
+const STORAGE_KEY = "nptel-quiz-progress";
+
 const NPTELQuiz = () => {
   const [selectedWeek, setSelectedWeek] = useState<WeekKey | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
+
+  // Load progress from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const allProgress: QuizProgress = JSON.parse(saved);
+        // Check if there's a saved week in progress
+        const weeksInProgress = Object.keys(allProgress);
+        if (weeksInProgress.length > 0) {
+          // Load the most recent week (last one in the object)
+          const lastWeek = weeksInProgress[
+            weeksInProgress.length - 1
+          ] as WeekKey;
+          const weekProgress = allProgress[lastWeek];
+          if (
+            weekProgress &&
+            typeof weekProgress.currentQuestion !== "undefined"
+          ) {
+            setSelectedWeek(lastWeek);
+            setCurrentQuestion(weekProgress.currentQuestion);
+            setAnswers(weekProgress.answers || {});
+            setShowResults(weekProgress.showResults || false);
+            setSelectedAnswer(
+              (weekProgress.answers &&
+                weekProgress.answers[weekProgress.currentQuestion]) ??
+                null
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading progress:", error);
+    }
+  }, []);
+
+  // Save progress to localStorage whenever state changes
+  useEffect(() => {
+    if (!selectedWeek) return;
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const allProgress: QuizProgress = saved ? JSON.parse(saved) : {};
+
+      // Save current week's progress
+      allProgress[selectedWeek] = {
+        currentQuestion,
+        answers,
+        showResults,
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allProgress));
+    } catch (error) {
+      console.error("Error saving progress:", error);
+    }
+  }, [selectedWeek, currentQuestion, answers, showResults]);
 
   const weeks = (Object.keys(quizData) as WeekKey[]).map((key, idx) => ({
     id: key,
@@ -46,11 +121,42 @@ const NPTELQuiz = () => {
   }));
 
   const handleWeekSelect = (weekId: WeekKey) => {
-    setSelectedWeek(weekId);
-    setCurrentQuestion(0);
-    setSelectedAnswer(null);
-    setAnswers({});
-    setShowResults(false);
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const allProgress: QuizProgress = saved ? JSON.parse(saved) : {};
+
+      // Check if this week has saved progress
+      if (
+        allProgress[weekId] &&
+        typeof allProgress[weekId].currentQuestion !== "undefined"
+      ) {
+        const weekProgress = allProgress[weekId];
+        setSelectedWeek(weekId);
+        setCurrentQuestion(weekProgress.currentQuestion);
+        setAnswers(weekProgress.answers || {});
+        setShowResults(weekProgress.showResults || false);
+        setSelectedAnswer(
+          (weekProgress.answers &&
+            weekProgress.answers[weekProgress.currentQuestion]) ??
+            null
+        );
+      } else {
+        // Start fresh for this week
+        setSelectedWeek(weekId);
+        setCurrentQuestion(0);
+        setSelectedAnswer(null);
+        setAnswers({});
+        setShowResults(false);
+      }
+    } catch (error) {
+      console.error("Error loading week progress:", error);
+      // Fallback to fresh start
+      setSelectedWeek(weekId);
+      setCurrentQuestion(0);
+      setSelectedAnswer(null);
+      setAnswers({});
+      setShowResults(false);
+    }
   };
 
   const handleAnswerSelect = (optionIndex: number) => {
@@ -81,6 +187,30 @@ const NPTELQuiz = () => {
 
   const handleFinish = () => {
     setShowResults(true);
+  };
+
+  const handleRestart = () => {
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setAnswers({});
+    setShowResults(false);
+  };
+
+  const clearAllProgress = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      setSelectedWeek(null);
+      setCurrentQuestion(0);
+      setSelectedAnswer(null);
+      setAnswers({});
+      setShowResults(false);
+    } catch (error) {
+      console.error("Error clearing progress:", error);
+    }
+  };
+
+  const backToWeeks = () => {
+    setSelectedWeek(null);
   };
 
   const calculateScore = () => {
@@ -221,21 +351,17 @@ const NPTELQuiz = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <button
-                onClick={() => setSelectedWeek(null)}
+                onClick={backToWeeks}
                 className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold text-sm sm:text-base"
               >
                 Back to Weeks
               </button>
               <button
-                onClick={() => {
-                  setCurrentQuestion(0);
-                  setSelectedAnswer(null);
-                  setAnswers({});
-                  setShowResults(false);
-                }}
-                className="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold text-sm sm:text-base"
+                onClick={clearAllProgress}
+                className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold text-sm sm:text-base inline-flex items-center justify-center gap-2"
               >
-                Retake Quiz
+                <RotateCcw size={18} />
+                Start Fresh
               </button>
             </div>
           </div>
@@ -264,7 +390,7 @@ const NPTELQuiz = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-3">
           <button
-            onClick={() => setSelectedWeek(null)}
+            onClick={backToWeeks}
             className="text-gray-400 hover:text-white text-sm sm:text-base"
           >
             ← Back to Weeks

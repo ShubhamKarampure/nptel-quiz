@@ -1,0 +1,27 @@
+import week1 from "../data/week1";
+import week2 from "../data/week2";
+import week3 from "../data/week3";
+import week4 from "../data/week4";
+import week5 from "../data/week5";
+import week6 from "../data/week6";
+import week7 from "../data/week7";
+import week8 from "../data/week8";
+import week9 from "../data/week9";
+import week10 from "../data/week10";
+import week11 from "../data/week11";
+import week12 from "../data/week12";
+
+const quizData = {
+  week_1: week1,
+  week_2: week2,
+  week_3: week3,
+  week_4: week4,
+  week_5: week5,
+  week_6: week6,
+  week_7: week7,
+  week_8: week8,
+  week_9: week9,
+  week_10: week10,
+  week_11: week11,
+  week_12: week12,
+};
