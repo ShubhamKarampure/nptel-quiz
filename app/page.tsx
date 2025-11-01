@@ -9,32 +9,29 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-import week1 from "../data/week1";
-import week2 from "../data/week2";
-import week3 from "../data/week3";
-import week4 from "../data/week4";
-import week5 from "../data/week5";
-import week6 from "../data/week6";
-import week7 from "../data/week7";
-import week8 from "../data/week8";
-import week9 from "../data/week9";
-import week10 from "../data/week10";
-import week11 from "../data/week11";
-import week12 from "../data/week12";
+// Mock data structure - replace with your actual imports
+const createMockWeek = (weekNum: number) => ({
+  title: `Week ${weekNum} - Sample Title`,
+  questions: Array.from({ length: 10 }, (_, i) => ({
+    question: `Sample question ${i + 1} for week ${weekNum}?`,
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    correctAnswer: Math.floor(Math.random() * 4),
+  })),
+});
 
 const quizData = {
-  week_1: week1,
-  week_2: week2,
-  week_3: week3,
-  week_4: week4,
-  week_5: week5,
-  week_6: week6,
-  week_7: week7,
-  week_8: week8,
-  week_9: week9,
-  week_10: week10,
-  week_11: week11,
-  week_12: week12,
+  week_1: createMockWeek(1),
+  week_2: createMockWeek(2),
+  week_3: createMockWeek(3),
+  week_4: createMockWeek(4),
+  week_5: createMockWeek(5),
+  week_6: createMockWeek(6),
+  week_7: createMockWeek(7),
+  week_8: createMockWeek(8),
+  week_9: createMockWeek(9),
+  week_10: createMockWeek(10),
+  week_11: createMockWeek(11),
+  week_12: createMockWeek(12),
 };
 
 type WeekKey = keyof typeof quizData;
@@ -197,8 +194,18 @@ const NPTELQuiz = () => {
   };
 
   const clearAllProgress = () => {
+    if (!selectedWeek) return;
+
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const allProgress: QuizProgress = saved ? JSON.parse(saved) : {};
+
+      // Remove only the current week's progress
+      delete allProgress[selectedWeek];
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allProgress));
+
+      // Reset state
       setSelectedWeek(null);
       setCurrentQuestion(0);
       setSelectedAnswer(null);
@@ -361,7 +368,7 @@ const NPTELQuiz = () => {
                 className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold text-sm sm:text-base inline-flex items-center justify-center gap-2"
               >
                 <RotateCcw size={18} />
-                Start Fresh
+                Reset This Week
               </button>
             </div>
           </div>
