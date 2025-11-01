@@ -125,7 +125,7 @@ const NPTELQuiz = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">
-              NPTEL Quiz
+              NPTEL Env and Dev Quiz
             </h1>
             <p className="text-gray-400 text-sm sm:text-base">
               Select a week to start the quiz
