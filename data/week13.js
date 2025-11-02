@@ -685,7 +685,7 @@ const week13 = {
         "Ecological issue",
         "Political issue",
       ],
-      correctAnswer: 1,
+      correctAnswer: 0,
     },
     {
       id: 67,
