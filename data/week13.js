@@ -1055,7 +1055,7 @@ const week13 = {
         "To enquire into environmental issues in developed and developing countries",
         "To promote the European Enlightenment's worldview",
       ],
-      correctAnswer: 2,
+      correctAnswer: 1,
     },
     {
       id: 100,
@@ -1169,7 +1169,7 @@ const week13 = {
         "Development",
         "Gender and environment",
       ],
-      correctAnswer: 3,
+      correctAnswer: 0,
     },
     {
       id: 110,
