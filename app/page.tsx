@@ -21,6 +21,7 @@ import week9 from "../data/week9";
 import week10 from "../data/week10";
 import week11 from "../data/week11";
 import week12 from "../data/week12";
+import week13 from "../data/week13";
 
 const quizData = {
   week_1: week1,
@@ -35,6 +36,7 @@ const quizData = {
   week_10: week10,
   week_11: week11,
   week_12: week12,
+  week_13: week13,
 };
 type WeekKey = keyof typeof quizData;
 
