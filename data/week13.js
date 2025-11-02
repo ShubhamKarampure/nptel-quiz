@@ -1139,7 +1139,7 @@ const week13 = {
         "Arun Agrawal",
         "Ramachandra Guha",
       ],
-      correctAnswer: 3,
+      correctAnswer: 0,
     },
     {
       id: 107,
