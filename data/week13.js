@@ -930,8 +930,8 @@ const week13 = {
       id: 88,
       question:
         "Which ritual is known as the greatest feast (or test of loyalty/courage) among the Kuki community?",
-      options: ["Jhumming", "Siel-meilah", "Vohpi dedication", "Van Panchayat"],
-      correctAnswer: 1,
+      options: ["Jhumming", "Siel-meilah", "Vohpi dedication", "Chon"],
+      correctAnswer: 3,
     },
     {
       id: 89,
